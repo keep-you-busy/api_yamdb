@@ -3,10 +3,11 @@ from django.shortcuts import render
 from rest_framework import (filters, mixins, permissions, status, views,
                             viewsets)
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import Token
 from reviews.models import User
 
 from .serializers import GetTokenSerializer, SingUpSerializer, UsersSerializer
-from .utils import make_token
+from .utils import check_token, get_token_for_user, make_token
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -18,9 +19,8 @@ class UsersViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
 
 
-class SingUpViewSet(views.APIView):
+class SingUpView(views.APIView):
     permission_classes = (permissions.AllowAny,)
-    lookup_field = 'username'
 
     def post(self, request):
         serializer = SingUpSerializer(data=request.data)
@@ -37,10 +37,3 @@ class SingUpViewSet(views.APIView):
             fail_silently=False
         )
         return Response(request.data, status=status.HTTP_200_OK)
-
-
-
-
-class GetTokenViewSet(viewsets.ViewSet):
-    serializer_class = GetTokenSerializer
-
