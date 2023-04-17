@@ -17,7 +17,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
 
 
-class SingUpView(views.APIView):
+class SignUpView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
