@@ -1,9 +1,7 @@
 from django.core.mail import send_mail
 from django.shortcuts import render
-from rest_framework import (filters, mixins, permissions, status, views,
-                            viewsets)
+from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import Token
 from reviews.models import User
 
 from .serializers import GetTokenSerializer, SingUpSerializer, UsersSerializer
