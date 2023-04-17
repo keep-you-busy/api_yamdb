@@ -1,11 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-USER = 'user'
-ADMIN = 'admin'
-MODERATOR = 'moderator'
 
 class User(AbstractUser):
+    """A custom user model. With user, admin and moderator roles."""
+
+    USER = 'user'
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+
     CHOICES = [
         (USER, 'Аутентифицированный пользователь'),
         (ADMIN, 'Администратор'),
@@ -36,6 +39,18 @@ class User(AbstractUser):
         choices=CHOICES,
         default=USER
     )
+
+    @property
+    def is_user(self):
+        return self.role == self.USER
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
 
     class Meta:
         verbose_name = 'Пользователь',
