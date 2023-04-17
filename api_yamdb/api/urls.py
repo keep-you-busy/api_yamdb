@@ -11,7 +11,7 @@ router_v1.register(
 
 
 urlpatterns = [
-    path('v1/auth/singup/', SingUpViewSet),
+    path('v1/auth/singup/', SingUpViewSet.as_view()),
     path('v1/auth/token/', GetTokenViewSet),
     path('v1/', include(router_v1.urls)),
 ]

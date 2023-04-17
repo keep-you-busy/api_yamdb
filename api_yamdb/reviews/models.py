@@ -15,9 +15,8 @@ class User(AbstractUser):
         (MODERATOR, 'Модератор'),
     ]
     email = models.EmailField(
+        'Адрес электронной почты',
         unique=True,
-        blank=False,
-        null=False
     )
     first_name = models.CharField(
         'Имя',
