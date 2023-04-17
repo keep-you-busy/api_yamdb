@@ -37,3 +37,24 @@ class SingUpView(views.APIView):
             fail_silently=False
         )
         return Response(request.data, status=status.HTTP_200_OK)
+
+
+class GetTokenView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            user = User.objects.get(username=data.get('username'))
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Пользователь не найден!'},
+                status=status.HTTP_404_NOT_FOUND)
+        if check_token(user=user, token=data.get('confirmation_code')):
+            return Response({'token': get_token_for_user(user)},
+                            status=status.HTTP_201_CREATED)
+        return Response(
+            {'confirmation_code': 'Неверный код подтверждения!'},
+            status=status.HTTP_400_BAD_REQUEST)
