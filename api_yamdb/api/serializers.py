@@ -17,7 +17,9 @@ class SingUpSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError('Недоступное имя пользователя!')
+            raise serializers.ValidationError(
+                f'{value}: запрещенное имя пользователя!'
+            )
         return value
 
 class GetTokenSerializer(serializers.ModelSerializer):
