@@ -15,8 +15,18 @@ class SingUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username',)
 
-class GetTokenSerializer(serializers.ModelSerializer):
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Недоступное имя пользователя!')
+        return value
 
+class GetTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        required=True
+    )
+    confirmation_code = serializers.CharField(
+        required=True
+    )
     class Meta:
         model = User
         fields = ('username', 'confirmation_code',)
