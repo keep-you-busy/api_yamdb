@@ -1,13 +1,19 @@
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.response import Response
-from reviews.models import Review, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
+from .filters import TitleFilter
+from .mixins import CustomMixin
 from .permissions import AdminModeratorAuthorPermission
-from .serializers import (CommentSerializer, GetTokenSerializer,
-                          ReviewSerializer, SingUpSerializer, UsersSerializer)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, GetTokenSerializer,
+                          ReviewSerializer, SingUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UsersSerializer)
 from .utils import check_token, get_token_for_user, make_token
 
 
@@ -85,3 +91,36 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
+class CategoryViewSet(CustomMixin):
+    """Категории"""
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+
+class GenreViewSet(CustomMixin):
+    """Жанры"""
+
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    """Произведения"""
+
+    queryset = (
+        Title.objects.all()
+        .annotate(rating=Avg("reviews__score"))
+        .order_by("-id")
+    )
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ["POST", "PATCH"]:
+            return TitleWriteSerializer
+        return TitleReadSerializer

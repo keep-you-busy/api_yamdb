@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -108,6 +109,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+CSV_FILE_PATH = os.path.join(BASE_DIR, 'static/data')
+
+CHARS_LENGTH = 15
 
 
 # REST integration
