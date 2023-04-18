@@ -1,16 +1,13 @@
 from django.core.mail import send_mail
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.response import Response
-from reviews.models import User
-from django.shortcuts import get_object_or_404
+from reviews.models import Review, Title, User
+
 from .permissions import AdminModeratorAuthorPermission
-from reviews.models import Review, Title
-from .serializers import (CommentSerializer, ReviewSerializer)
-from django.db.models import Avg
-
-
-
-from .serializers import GetTokenSerializer, SingUpSerializer, UsersSerializer
+from .serializers import (CommentSerializer, GetTokenSerializer,
+                          ReviewSerializer, SingUpSerializer, UsersSerializer)
 from .utils import check_token, get_token_for_user, make_token
 
 
@@ -63,7 +60,7 @@ class GetTokenView(views.APIView):
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
 
-lass ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     rating = Review.objects.aggregate(Avg("score"))
     serializer_class = ReviewSerializer
     permission_classes = AdminModeratorAuthorPermission
