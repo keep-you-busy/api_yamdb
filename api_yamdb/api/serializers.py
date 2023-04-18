@@ -11,6 +11,7 @@ class UsersSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+
 class SingUpSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -32,6 +33,7 @@ class GetTokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField(
         required=True
     )
+
     class Meta:
         model = User
         fields = ('username', 'confirmation_code',)
@@ -59,8 +61,8 @@ class ReviewSerializer(ModelSerializer):
         author = request.user
         title = get_object_or_404(Title)
         if (request.method == 'POST'
-            and Review.objects.filter(title=title, author=author).exists()
-            ):
+                and Review.objects.filter(
+                title=title, author=author).exists()):
             raise ValidationError('Одно произведение - один отзыв!')
         return data
 

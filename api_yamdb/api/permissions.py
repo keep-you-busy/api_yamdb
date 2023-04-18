@@ -1,8 +1,9 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class AdminModeratorAuthorPermission(BasePermission):
     """Редактировать и удалять пост может только владелец."""
+
     def has_permission(self, request, view):
         return (request.method in SAFE_METHODS
                 or request.user.is_authenticated
