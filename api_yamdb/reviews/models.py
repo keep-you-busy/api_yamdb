@@ -62,8 +62,10 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
+
 class CommonCategoryGenre(models.Model):
     """Абстрактная модель для хранения общих данных."""
+
     name = models.CharField(
         "Название",
         max_length=250
@@ -101,6 +103,7 @@ class Genre(CommonCategoryGenre):
 
 class Title(models.Model):
     """Модель произведения искусства."""
+
     name = models.CharField(
         "Название",
         max_length=250,
