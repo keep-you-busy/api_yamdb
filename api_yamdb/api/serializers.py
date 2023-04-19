@@ -79,6 +79,7 @@ class CommentSerializer(ModelSerializer):
         fields = '__all__'
         model = Comment
 
+
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор категорий"""
 
@@ -91,7 +92,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """Сериализатор жанров"""
+    """Сериализатор жанров."""
 
     class Meta:
         model = Genre
@@ -136,4 +137,3 @@ class TitleReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = "__all__"
-

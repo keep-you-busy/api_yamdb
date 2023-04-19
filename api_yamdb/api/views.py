@@ -66,6 +66,7 @@ class GetTokenView(views.APIView):
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
 
+
 class ReviewViewSet(viewsets.ModelViewSet):
     rating = Review.objects.aggregate(Avg("score"))
     serializer_class = ReviewSerializer
@@ -87,13 +88,14 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         return review.comments
-    
+
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
 
+
 class CategoryViewSet(CustomMixin):
-    """Категории"""
+    """Категории."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -101,7 +103,7 @@ class CategoryViewSet(CustomMixin):
 
 
 class GenreViewSet(CustomMixin):
-    """Жанры"""
+    """Жанры."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -109,7 +111,7 @@ class GenreViewSet(CustomMixin):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Произведения"""
+    """Произведения."""
 
     queryset = (
         Title.objects.all()
