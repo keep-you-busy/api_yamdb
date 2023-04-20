@@ -1,7 +1,7 @@
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-from .permissions import IsAdminOrReadOnly
+from .permissions import AdminModeratorAuthorPermission
 
 
 class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
@@ -16,6 +16,6 @@ class CustomMixin(
 ):
     filter_backends = [filters.SearchFilter]
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (AdminModeratorAuthorPermission,)
     lookup_field = "slug"
     search_fields = ["=name"]

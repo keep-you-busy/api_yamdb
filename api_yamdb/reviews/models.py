@@ -62,6 +62,7 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
+
 class CommonCategoryGenre(models.Model):
     """Абстрактная модель для хранения общих данных."""
     name = models.CharField(
@@ -173,8 +174,19 @@ class Review(models.Model):
                     MaxValueValidator(10)),
         error_messages={'validators': 'Оценка должна быть от 1 до 10'}
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+    
+    class Meta:
+        ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "title"], name="unique_review"
+            )
+        ]
+
+    def __str__(self):
+        return self.text
 
 
 class Comment(models.Model):
@@ -183,5 +195,11 @@ class Comment(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-pub_date"]
+
+    def __str__(self):
+        return self.text
