@@ -1,9 +1,11 @@
+from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from reviews.models import Category, Genre, Review, Title, User
@@ -22,9 +24,12 @@ from .utils import check_token, get_token_for_user, make_token
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = (IsAdministrator,)
+    pagination_class = PageNumberPagination
     serializer_class = UsersSerializer
+    lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=['GET', 'PATCH'],
@@ -55,14 +60,13 @@ class SignUpView(views.APIView):
     def post(self, request):
         serializer = SingUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        user = User.objects.get(username=request.data.get('username'))
+        user = serializer.save()
         confirmation_code = make_token(user)
         send_mail(
             subject='Код подтверждения для регистрации',
             message=f'Код подтверждения для пользователя {user.username}:'
                     f' {confirmation_code}',
-            from_email='from@example.com',
+            from_email=DEFAULT_FROM_EMAIL,
             recipient_list=[f'{user.email}'],
             fail_silently=False
         )
@@ -93,11 +97,12 @@ class GetTokenView(views.APIView):
 class ReviewViewSet(viewsets.ModelViewSet):
     rating = Review.objects.aggregate(Avg("score"))
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+    pagination_class = PageNumberPagination
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        return title.reviews
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -106,14 +111,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+    pagination_class = PageNumberPagination
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
-        return review.comments
-
+        review = get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id'))
+        return review.comments.all()
+    
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, review=review)
 
 
@@ -123,7 +135,7 @@ class CategoryViewSet(CustomMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
-
+    pagination_class = PageNumberPagination
 
 class GenreViewSet(CustomMixin):
     """Жанры."""
@@ -131,6 +143,7 @@ class GenreViewSet(CustomMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -143,6 +156,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     )
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
+    pagination_class = PageNumberPagination
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
