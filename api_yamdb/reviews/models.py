@@ -176,7 +176,7 @@ class Review(models.Model):
                     MaxValueValidator(10)),
         error_messages={'validators': 'Оценка должна быть от 1 до 10'}
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
 
