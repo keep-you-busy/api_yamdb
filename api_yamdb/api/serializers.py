@@ -56,24 +56,22 @@ class ReviewSerializer(ModelSerializer):
         read_only=True, slug_field='name'
     )
 
-    class Meta:
-        fields = '__all__'
-        model = Review
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            title_id = self.context.get('view').kwargs.get('title_id')
+            user = self.context['request'].user
+            if Review.objects.filter(title_id=title_id, author=user).exists():
+                raise ValidationError('Одно произведение - один отзыв!')
+        return data
 
     def score_valid(self, value):
         if (value < 1) or (value > 10):
             raise ValidationError('Оценка должна быть от 1 до 10')
         return value
-
-    def validate(self, data):
-        request = self.context['request']
-        author = request.user
-        title = get_object_or_404(Title)
-        if (request.method == 'POST'
-                and Review.objects.filter(
-                title=title, author=author).exists()):
-            raise ValidationError('Одно произведение - один отзыв!')
-        return data
+    
+    class Meta:
+        fields = '__all__'
+        model = Review
 
 
 class CommentSerializer(ModelSerializer):
