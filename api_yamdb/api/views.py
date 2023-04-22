@@ -72,8 +72,9 @@ class SignUpView(views.APIView):
     def post(self, request):
         if User.objects.filter(username=request.data.get('username'),
                                email=request.data.get('email')).exists():
-            user = User.objects.get(username=request.data.get('username'))
-            self.send_confirmation_code(user)
+            self.send_confirmation_code(
+                User.objects.get(username=request.data.get('username'))
+            )
             return Response(request.data, status=status.HTTP_200_OK)
         else:
             serializer = SingUpSerializer(data=request.data)
