@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, views, viewsets
+from rest_framework import filters, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -22,6 +22,8 @@ from .utils import check_token, get_token_for_user, make_token
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """Пользователи."""
+
     queryset = User.objects.all()
     permission_classes = (IsAdministrator,)
     pagination_class = PageNumberPagination
@@ -54,7 +56,10 @@ class UsersViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.data)
 
+
 class SignUpView(views.APIView):
+    """Регистрация пользователя."""
+
     permission_classes = (AllowAny,)
 
     @staticmethod
@@ -85,6 +90,8 @@ class SignUpView(views.APIView):
 
 
 class GetTokenView(views.APIView):
+    """Получение токена."""
+
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -106,6 +113,8 @@ class GetTokenView(views.APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Отзывы."""
+
     rating = Review.objects.aggregate(Avg("score"))
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
@@ -121,6 +130,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Комментарии."""
+
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsOwnerOrReadOnly,)
@@ -131,7 +142,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             pk=self.kwargs.get('review_id'),
             title__id=self.kwargs.get('title_id'))
         return review.comments.all()
-    
+
     def perform_create(self, serializer):
         review = get_object_or_404(
             Review,
@@ -147,6 +158,7 @@ class CategoryViewSet(CustomMixin):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
+
 
 class GenreViewSet(CustomMixin):
     """Жанры."""
