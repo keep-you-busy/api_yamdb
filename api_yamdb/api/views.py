@@ -22,6 +22,8 @@ from .utils import check_token, get_token_for_user, make_token
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """Пользователи."""
+
     queryset = User.objects.all()
     permission_classes = (IsAdministrator,)
     pagination_class = PageNumberPagination
@@ -56,12 +58,12 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 
 class SignUpView(views.APIView):
+    """Регистрация пользователя."""
+
     permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = SingUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+    @staticmethod
+    def send_confirmation_code(user):
         confirmation_code = make_token(user)
         send_mail(
             subject='Код подтверждения для регистрации',
@@ -71,10 +73,25 @@ class SignUpView(views.APIView):
             recipient_list=[f'{user.email}'],
             fail_silently=False
         )
-        return Response(request.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        if User.objects.filter(username=request.data.get('username'),
+                               email=request.data.get('email')).exists():
+            self.send_confirmation_code(
+                User.objects.get(username=request.data.get('username'))
+            )
+            return Response(request.data, status=status.HTTP_200_OK)
+        else:
+            serializer = SingUpSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            self.send_confirmation_code(user)
+            return Response(request.data, status=status.HTTP_200_OK)
 
 
 class GetTokenView(views.APIView):
+    """Получение токена."""
+
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -96,6 +113,12 @@ class GetTokenView(views.APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+<<<<<<< HEAD
+=======
+    """Отзывы."""
+
+    rating = Review.objects.aggregate(Avg("score"))
+>>>>>>> 7e045cd9235a7c678a1d482882c50fad2de227a5
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsOwnerOrReadOnly,)
@@ -110,6 +133,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Комментарии."""
+
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsOwnerOrReadOnly,)
@@ -120,7 +145,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             pk=self.kwargs.get('review_id'),
             title__id=self.kwargs.get('title_id'))
         return review.comments.all()
-    
+
     def perform_create(self, serializer):
         review = get_object_or_404(
             Review,

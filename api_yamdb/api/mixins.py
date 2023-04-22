@@ -8,6 +8,7 @@ class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                         viewsets.GenericViewSet):
     pass
 
+
 class CustomMixin(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,

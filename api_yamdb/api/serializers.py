@@ -5,6 +5,7 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UsersSerializer(serializers.ModelSerializer):
+    """Сериализатор пользователей."""
 
     class Meta:
         model = User
@@ -14,6 +15,8 @@ class UsersSerializer(serializers.ModelSerializer):
 
 
 class NotAdminSerializer(serializers.ModelSerializer):
+    """Сериализатор для обычных пользователей."""
+
     class Meta:
         model = User
         fields = (
@@ -21,7 +24,9 @@ class NotAdminSerializer(serializers.ModelSerializer):
             'last_name', 'bio', 'role')
         read_only_fields = ('role',)
 
+
 class SingUpSerializer(serializers.ModelSerializer):
+    """Сериализатор регистрации."""
 
     class Meta:
         model = User
@@ -49,6 +54,8 @@ class GetTokenSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(ModelSerializer):
+    """Сериализатор отзывов."""
+
     author = SlugRelatedField(
         read_only=True, slug_field='username'
     )
@@ -68,13 +75,15 @@ class ReviewSerializer(ModelSerializer):
         if (value < 1) or (value > 10):
             raise ValidationError('Оценка должна быть от 1 до 10')
         return value
-    
+
     class Meta:
         fields = '__all__'
         model = Review
 
 
 class CommentSerializer(ModelSerializer):
+    """Сериализатор комментариев."""
+
     author = SlugRelatedField(
         read_only=True, slug_field='username'
     )
@@ -88,7 +97,7 @@ class CommentSerializer(ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор категорий"""
+    """Сериализатор категорий."""
 
     class Meta:
         model = Category

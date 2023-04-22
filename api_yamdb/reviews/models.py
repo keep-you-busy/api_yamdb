@@ -7,7 +7,7 @@ from .validators import validate_creation_year
 
 
 class User(AbstractUser):
-    """A custom user model. With user, admin and moderator roles."""
+    """Модель пользователя."""
 
     USER = 'user'
     ADMIN = 'admin'
@@ -166,6 +166,8 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
+    """Модель отзывов."""
+
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(
@@ -192,6 +194,8 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    """Модель комментариев."""
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
     review = models.ForeignKey(
