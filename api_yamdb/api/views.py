@@ -57,10 +57,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 class SignUpView(views.APIView):
     permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = SingUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+    @staticmethod
+    def send_confirmation_code(user):
         confirmation_code = make_token(user)
         send_mail(
             subject='Код подтверждения для регистрации',
@@ -70,7 +68,19 @@ class SignUpView(views.APIView):
             recipient_list=[f'{user.email}'],
             fail_silently=False
         )
-        return Response(request.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        if User.objects.filter(username=request.data.get('username'),
+                               email=request.data.get('email')).exists():
+            user = User.objects.get(username=request.data.get('username'))
+            self.send_confirmation_code(user)
+            return Response(request.data, status=status.HTTP_200_OK)
+        else:
+            serializer = SingUpSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            self.send_confirmation_code(user)
+            return Response(request.data, status=status.HTTP_200_OK)
 
 
 class GetTokenView(views.APIView):
