@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
 from reviews.models import Category, Comment, Genre, Review, Title, User
@@ -12,6 +11,7 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role')
+
 
 class NotAdminSerializer(serializers.ModelSerializer):
     class Meta:

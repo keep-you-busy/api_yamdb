@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, views, viewsets
+from rest_framework import filters, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -54,6 +54,7 @@ class UsersViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.data)
 
+
 class SignUpView(views.APIView):
     permission_classes = (AllowAny,)
 
@@ -95,7 +96,6 @@ class GetTokenView(views.APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    rating = Review.objects.aggregate(Avg("score"))
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsOwnerOrReadOnly,)
@@ -136,6 +136,7 @@ class CategoryViewSet(CustomMixin):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
+
 
 class GenreViewSet(CustomMixin):
     """Жанры."""
