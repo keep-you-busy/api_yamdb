@@ -113,12 +113,6 @@ class GetTokenView(views.APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-<<<<<<< HEAD
-=======
-    """Отзывы."""
-
-    rating = Review.objects.aggregate(Avg("score"))
->>>>>>> 7e045cd9235a7c678a1d482882c50fad2de227a5
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsOwnerOrReadOnly,)
