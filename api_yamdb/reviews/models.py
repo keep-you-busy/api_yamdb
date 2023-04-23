@@ -182,7 +182,7 @@ class Review(models.Model):
         'Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
                 fields=["author", "title"], name="unique_review"
@@ -190,7 +190,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Comment(models.Model):
@@ -205,7 +205,7 @@ class Comment(models.Model):
         'Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
-        ordering = ["-pub_date"]
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text

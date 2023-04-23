@@ -71,11 +71,6 @@ class ReviewSerializer(ModelSerializer):
                 raise ValidationError('Одно произведение - один отзыв!')
         return data
 
-    def score_valid(self, value):
-        if (value < 1) or (value > 10):
-            raise ValidationError('Оценка должна быть от 1 до 10')
-        return value
-
     class Meta:
         fields = '__all__'
         model = Review
