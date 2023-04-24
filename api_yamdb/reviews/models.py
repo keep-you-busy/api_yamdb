@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -44,6 +45,10 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == self.MODERATOR
+
+    def clean(self):
+        if self.username == 'me':
+            raise ValidationError({'me': 'Запрещенное имя пользователя!'})
 
     class Meta:
         verbose_name = 'Пользователь',
