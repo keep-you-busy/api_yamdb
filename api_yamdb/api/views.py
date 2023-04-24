@@ -15,9 +15,9 @@ from .mixins import CustomMixin
 from .permissions import IsAdministrator, IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, GetTokenSerializer,
-                          NotAdminSerializer, ReviewSerializer,
-                          SingUpSerializer, TitleReadSerializer,
-                          TitleWriteSerializer, UsersSerializer)
+                          ReviewSerializer, SingUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UsersSerializer)
 from .utils import check_token, get_token_for_user, make_token
 
 
@@ -40,20 +40,19 @@ class UsersViewSet(viewsets.ModelViewSet):
         url_path='me')
     def get_current_user_info(self, request):
         serializer = UsersSerializer(request.user)
+        if 'role' in request.data:
+            return Response(serializer.data,
+                            status=status.HTTP_400_BAD_REQUEST)
         if request.method == 'PATCH':
-            if request.user.is_admin:
-                serializer = UsersSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True)
-            else:
-                serializer = NotAdminSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True)
+            serializer = UsersSerializer(
+                request.user,
+                data=request.data,
+                partial=True)
+
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.data)
 
 
