@@ -21,6 +21,13 @@ class SingUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username',)
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                f'{value}: запрещенное имя пользователя!'
+            )
+        return value
+
 
 class GetTokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
