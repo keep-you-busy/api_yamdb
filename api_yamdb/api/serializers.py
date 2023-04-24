@@ -14,30 +14,12 @@ class UsersSerializer(serializers.ModelSerializer):
             'last_name', 'bio', 'role')
 
 
-class NotAdminSerializer(serializers.ModelSerializer):
-    """Сериализатор для обычных пользователей."""
-
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
-        read_only_fields = ('role',)
-
-
 class SingUpSerializer(serializers.ModelSerializer):
     """Сериализатор регистрации."""
 
     class Meta:
         model = User
         fields = ('email', 'username',)
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                f'{value}: запрещенное имя пользователя!'
-            )
-        return value
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
