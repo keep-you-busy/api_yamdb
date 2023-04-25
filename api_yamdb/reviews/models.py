@@ -35,6 +35,9 @@ class Category(CommonCategoryGenre):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+    def __str__(self):
+        return self.name
+
 
 class Genre(CommonCategoryGenre):
     """Модель жанра."""
@@ -42,6 +45,9 @@ class Genre(CommonCategoryGenre):
     class Meta(CommonCategoryGenre.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
 
 
 class Title(models.Model):
@@ -99,9 +105,9 @@ class GenreTitle(models.Model):
         verbose_name="Жанр",
     )
 
-    def __str__(self):
-        return f"{self.title}, жанр - {self.genre}"
-
     class Meta:
         verbose_name = "Произведение и жанр"
         verbose_name_plural = "Произведения и жанры"
+
+    def __str__(self):
+        return f"{self.title}, жанр - {self.genre}"
