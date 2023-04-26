@@ -38,7 +38,6 @@ class Command(BaseCommand):
                 objects.append(model(**obj_kwargs))
             model.objects.bulk_create(objects)
 
-
     def handler(self, *args, **options):
         """Начинает импортировать и записывать данные в базу данных."""
         field_classes = {
