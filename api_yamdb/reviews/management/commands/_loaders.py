@@ -18,137 +18,44 @@ class Command(BaseCommand):
     help = "Импортирует данные из файлов CSV в базу данных"
 
     @staticmethod
-    def import_users_from_csv():
-        """Импортирует пользователей из файла CSV в базу данных."""
-        with open(settings.CSV_FILES_DIR / "users.csv", "rt") as file:
+    def import_from_csv(file_name, model, field_classes):
+        """Импортирует данные из CSV в базу данных для указанной модели."""
+        with open(settings.CSV_FILES_DIR / file_name, "rt") as file:
             file.readline()
             objects = []
             for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    User(
-                        id=row[0],
-                        username=row[1],
-                        email=row[2],
-                        role=row[3],
-                        bio=row[4],
-                        first_name=row[5],
-                        last_name=row[6],
-                    ),
-                )
-        User.objects.bulk_create(objects)
+                obj_kwargs = {}
+                # используется защищенный атрибут _meta
+                for i, field in enumerate(model._meta.fields):
+                    if field.name == "id":
+                        obj_kwargs[field.name] = row[i]
+                    # важный момент, было сложно реализовать но получилось!
+                    elif field.name in field_classes:
+                        obj_kwargs[field.name] = \
+                            field_classes[field.name].objects.get(id=row[i])
+                    else:
+                        obj_kwargs[field.name] = row[i]
+                objects.append(model(**obj_kwargs))
+            model.objects.bulk_create(objects)
 
-    @staticmethod
-    def import_categories_from_csv():
-        """Импортирует категории из файла CSV в базу данных"""
-        with open(settings.CSV_FILES_DIR / "category.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    Category(
-                        id=row[0],
-                        name=row[1],
-                        slug=row[2],
-                    ),
-                )
-            Category.objects.bulk_create(objects)
 
-    @staticmethod
-    def import_comments_from_csv():
-        """Импортирует комментарии из CSV-файла в базу данных."""
-        with open(settings.CSV_FILES_DIR / "comments.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    Comment(
-                        id=row[0],
-                        review=Review.objects.get(id=row[1]),
-                        text=row[2],
-                        author=User.objects.get(id=row[3]),
-                        pub_date=row[4],
-                    ),
-                )
-            Comment.objects.bulk_create(objects)
-
-    @staticmethod
-    def import_genres_from_csv():
-        """Импортирует жанры из файла CSV в базу данных"""
-        with open(settings.CSV_FILES_DIR / "genre.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    Genre(
-                        id=row[0],
-                        name=row[1],
-                        slug=row[2],
-                    ),
-                )
-            Genre.objects.bulk_create(objects)
-
-    @staticmethod
-    def import_titles_from_csv():
-        """Импортирует заголовки из CSV-файла в базу данных."""
-        with open(settings.CSV_FILES_DIR / "titles.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    Title(
-                        id=row[0],
-                        name=row[1],
-                        year=row[2],
-                        category=Category.objects.get(id=row[3]),
-                    ),
-                )
-            Title.objects.bulk_create(objects)
-
-    @staticmethod
-    def import_reviews_from_csv():
-        """Импортирует отзывы из файла CSV в базу данных"""
-        with open(settings.CSV_FILES_DIR / "review.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    Review(
-                        id=row[0],
-                        title=Title.objects.get(id=row[1]),
-                        text=row[2],
-                        author=User.objects.get(id=row[3]),
-                        score=row[4],
-                        pub_date=row[5],
-                    ),
-                )
-            Review.objects.bulk_create(objects)
-
-    @staticmethod
-    def import_genre_titles_from_csv():
-        """Импортирует названия жанров из CSV-файла в базу данных."""
-        with open(settings.CSV_FILES_DIR / "genre_title.csv", "rt") as file:
-            file.readline()
-            objects = []
-            for row in csv.reader(file, dialect="excel"):
-                objects.append(
-                    GenreTitle(
-                        id=row[0],
-                        title=Title.objects.get(id=row[1]),
-                        genre=Genre.objects.get(id=row[2]),
-                    ),
-                )
-            GenreTitle.objects.bulk_create(objects)
-
-    def handler(self, *args, **kwargs):
+    def handler(self, *args, **options):
         """Начинает импортировать и записывать данные в базу данных."""
+        field_classes = {
+            "author": User,
+            "category": Category,
+            "genre": Genre,
+            "review": Review,
+            "title": Title,
+        }
         try:
-            self.import_users_from_csv()
-            self.import_categories_from_csv()
-            self.import_titles_from_csv()
-            self.import_reviews_from_csv()
-            self.import_genres_from_csv()
-            self.import_comments_from_csv()
-            self.import_genre_titles_from_csv()
+            self.import_from_csv("users.csv", User, {})
+            self.import_from_csv("category.csv", Category, {})
+            self.import_from_csv("genre.csv", Genre, {})
+            self.import_from_csv("comments.csv", Comment, field_classes)
+            self.import_from_csv("titles.csv", Title, field_classes)
+            self.import_from_csv("review.csv", Review, field_classes)
+            self.import_from_csv("genre_title.csv", GenreTitle, field_classes)
         except Exception as err:
             self.stdout.write(self.style.ERROR(err))
             raise err

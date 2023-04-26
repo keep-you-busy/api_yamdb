@@ -11,7 +11,7 @@ class TitleAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
     def get_genre(self, title):
-        return [g.name for g in title.genre.all()]
+        return title.genre.all()
 
 
 admin.site.register(Genre)
