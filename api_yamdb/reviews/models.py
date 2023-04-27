@@ -194,7 +194,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:settings.CHARS_LENGTH]
 
 
 class Comment(models.Model):
