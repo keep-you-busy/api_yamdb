@@ -8,7 +8,6 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from reviews.models import Category, Genre, Review, Title, User
 
 from .filters import TitleFilter
 from .mixins import CustomMixin
@@ -18,6 +17,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           ReviewSerializer, SingUpSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           UsersSerializer)
+from reviews.models import Category, Genre, Review, Title, User
 from .utils import check_token, get_token_for_user, make_token
 
 

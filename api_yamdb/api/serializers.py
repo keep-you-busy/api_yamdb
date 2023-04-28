@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
-
+from core.user_validation import check_name
 
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор пользователей."""
@@ -23,10 +23,7 @@ class SingUpSerializer(serializers.ModelSerializer):
         fields = ('email', 'username',)
 
     def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                f'{value}: запрещенное имя пользователя!'
-            )
+        check_name(name=['me'], value=value)
         return value
 
 

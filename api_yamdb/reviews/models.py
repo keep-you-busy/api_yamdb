@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from core.user_validation import check_name
 
 from .validators import validate_creation_year
 
@@ -47,8 +47,8 @@ class User(AbstractUser):
         return self.role == self.MODERATOR
 
     def clean(self):
-        if self.username == 'me':
-            raise ValidationError({'me': 'Запрещенное имя пользователя!'})
+        super().clean()
+        check_name(value=self.username)
 
     class Meta:
         verbose_name = 'Пользователь',
