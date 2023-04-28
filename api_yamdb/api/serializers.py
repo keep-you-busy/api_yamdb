@@ -5,6 +5,7 @@ from rest_framework.serializers import ModelSerializer, SlugRelatedField
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from core.user_validation import check_name
 
+
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор пользователей."""
 
